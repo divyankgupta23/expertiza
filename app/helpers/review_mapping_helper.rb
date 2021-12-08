@@ -5,6 +5,24 @@ include ReviewChartHelper
     render partial: 'report_table_header', locals: {headers: headers}
   end
 
+#
+# gets the response map data such as reviewer id, reviewd object id and type for the review report
+#
+def data_for_review_report(reviewed_object_id, reviewer_id, type)
+  rspan = 0
+  (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
+
+  response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
+  response_maps.each do |ri|
+    rspan += 1 if Team.exists?(id: ri.reviewee_id)
+    responses = ri.response
+    (1..@assignment.num_review_rounds).each do |round|
+      instance_variable_set("@review_in_round_" + round.to_s, instance_variable_get("@review_in_round_" + round.to_s) + 1) if responses.exists?(round: round)
+    end
+  end
+  [response_maps, rspan]
+end
+
   #
   # gets the team name's color according to review and assignment submission status
   #
@@ -37,9 +55,9 @@ include ReviewChartHelper
   end
 
   # checks the submission state within each round and assigns team color
-  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+  def Fcheck_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates) and !link.nil?
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates) and !link.nil?F
       color.push 'purple'
     else
       if link.nil? or (link !~ %r{https*:\/\/wiki(.*)||https*:\/\/github(.*)})
