@@ -57,7 +57,7 @@ end
   # checks the submission state within each round and assigns team color
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates) and !link.nil?F
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates) and !link.nil?
       color.push 'purple'
     else
       if link.nil? or (link !~ %r{https*:\/\/wiki(.*)||https*:\/\/github(.*)})
